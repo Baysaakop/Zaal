@@ -1,0 +1,20 @@
+body {
+	background-image: url(../img/diagonales_decalees.png);
+}
+
+.logo {
+	font-family: 'Consolas', 'serif', cursive;
+}
+
+.logo a{
+	color: rgba(0, 0, 0, .9);
+}
+
+.logo a:hover,
+.logo a:active {
+	text-decoration: none;
+}
+
+.container-fluid {
+	font-family: 'Consolas', 'serif', cursive;
+}

@@ -1,0 +1,6 @@
+<option value="-1">
+---------
+</option>
+{% for dist in districts %}
+<option value="{{ dist.pk }}">{{ dist.name }}</option>
+{% endfor %}

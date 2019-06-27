@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}Courts{% endblock %}
+
+{% block stylesheet %}
+<style type="text/css">
+	.card-title {
+		font-weight: bold;
+	}
+
+	.address {
+		font-size: 12px;
+	}
+
+	.price {
+		font-size: 15px;
+	}
+
+	.card-img-top {
+		width: 100%;
+		height: 150px;
+		background-position: center center;
+		background-color:#fff;
+		background-size: cover;
+		background-repeat:no-repeat;
+		display: inline-block;
+	}
+
+	.card:hover {
+		opacity: .6;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container"> 
+	<div class="row mt-5">
+		<!-- Section of filter -->
+		<div class="col-sm-12 col-md-3 p-3 bg-light border">
+			<form method="post" id="filterForm" enctype="multipart/form-data" novalidate>
+				{% csrf_token %}
+				<!-- Filter by order date -->
+				<strong>TIME</strong>
+				<div class="form-group">
+					<label for="time">
+						Select time:
+					</label>
+					<select class="custom-select" id="time" name="time">
+						<option>Anytime</option>
+						<option>16:00-18:00</option>
+						<option>18:00-20:00</option>
+						<option>20:00-22:00</option>
+					</select>
+				</div>
+
+				<!-- Filter by location -->
+				<strong>LOCATION</strong>
+				<div class="form-group" id="address" data-districts-url="{% url 'load_districts' %}">
+					<label for="city">
+						Select city:
+					</label>
+					<select class="custom-select" id="city" name="city">
+						<option value="-1" {% if city %} selected {% endif %}>
+							-----------	
+						</option>
+						{% for c in cities %}
+						<option value="{{c.pk}}" {% if city == c %} selected {% endif %}>
+							{{c}}
+						</option>
+						{% endfor %}
+					</select>	
+					<label for="district">
+						Select district:
+					</label>
+					<select class="custom-select" id="district" name="district">
+						<option value="-1" {% if district %} selected {% endif %}>
+							-----------	
+						</option>
+						{% for d in districts %}
+						<option value="{{d.pk}}" {% if district == d %} selected {% endif %}>
+							{{d}}
+						</option>
+						{% endfor %}
+					</select>			
+				</div>		
+
+				<!-- Filter by price -->
+				<!--
+				<div class="form-group" id="price">
+					<strong>Price</strong><br>
+					<label>Select price:</label>
+					<div class="custom-control custom-radio">
+						<input type="radio" class="custom-control-input" id="radio1" name="price[]" value="1">
+						<label class="custom-control-label" for="radio1">0-25.000</label>
+					</div>
+					<div class="custom-control custom-radio">
+						<input type="radio" class="custom-control-input" id="radio2" name="price[]" value="2">
+						<label class="custom-control-label" for="radio2">25.000-50.000</label>
+					</div>
+					<div class="custom-control custom-radio">
+						<input type="radio" class="custom-control-input" id="radio3" name="price[]" value="3">
+						<label class="custom-control-label" for="radio3">50-75k</label>
+					</div>
+					<div class="custom-control custom-radio">
+						<input type="radio" class="custom-control-input" id="radio4" name="price[]" value="4">
+						<label class="custom-control-label" for="radio4">75k-100k</label>
+					</div>
+				</div>
+				-->
+				<div class="form-group" id="price">
+					<strong>PRICE</strong><br>
+					<label>Select price:</label>
+					<input type="text" class="form-control mb-1" id="min" name="price_min" placeholder="$Min" value="{% if price_min %}{{price_min}}{% endif %}">
+					<input type="text" class="form-control" id="max" name="price_max" placeholder="$Max" value="{% if price_max %}{{price_max}}{% endif %}">	
+				</div>							
+				<!-- Sort courts -->
+				<strong>SORT</strong>
+				<div class="form-group">
+					<label for="sort">
+						Sort by:
+					</label>
+					<select class="custom-select" id="sort" name="sort">
+						<option value="dateAsc" {% if sort_type == 'dateAsc' %} selected {% endif %}>Date (Asc)</option>
+						<option value="dateDesc" {% if sort_type == 'dateDesc' %} selected {% endif %}>Date (Desc)</option>
+						<option value="nameAsc" {% if sort_type == 'nameAsc' %} selected {% endif %}>Name (A-Z)</option>
+						<option value="nameDesc" {% if sort_type == 'nameDesc' %} selected {% endif %}>Name (Z-A)</option>
+						<option value="priceAsc" {% if sort_type == 'priceAsc' %} selected {% endif %}>Price (Asc)</option>
+						<option value="priceDesc" {% if sort_type == 'priceDesc' %} selected {% endif %}>Price (Desc)</option>
+						<option value="rating">Rating</option>
+						<option value="likes">Likes</option>						
+					</select>
+				</div>
+				<div class="text-center mt-2">
+					<button type="submit" class="btn btn-primary" name="mycourt">Filter</button>			
+				</div>
+			</form>
+		</div>
+		<!-- Section of result (Filtered courts list) -->
+		<div class="col-sm-12 col-md-9">
+			{% if courts|length == 0 %}
+			<p>No results found.</p>
+			{% else %}
+			<div class="card-columns">
+				{% for court in courts %}
+				<div class="card">
+					{% with court.photos.all|first as photo %}
+					<img class="card-img-top" src="{{photo.photo.url}}" alt="Card image">
+					{% endwith %}
+					<div class="card-body">
+						<h5 class="card-title name">{{court.name}}</h5>
+						<p class="card-text address">{{court.address}}</p>
+						<p class="card-text price">${{court.price}}</p>						
+						<a href="{% url 'court' court.pk %}" class="btn btn-primary stretched-link">See more</a>
+					</div>
+				</div>
+				{% endfor %}				
+			</div>			
+			{% include 'pagination.html' %}		
+			{% endif %}	
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	
+	$("#city").change(function () {
+		var url = $("#address").attr("data-districts-url");
+		var cityId = $(this).val();
+		
+		$.ajax({
+			url: url,
+			data: {
+				'city': cityId
+			},
+			success: function(data) {
+				$("#district").html(data);				
+			}
+		});
+	});
+
+</script>
+{% endblock %}

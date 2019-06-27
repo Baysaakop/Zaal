@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}{{court.name}}{% endblock %}
+
+{% block stylesheet %}
+<style type="text/css">
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+	<div class="row mt-5">
+		<div class="col-sm-12 col-md-6">		
+			{% with court.photos.all|first as photo %}
+				<img class="mainImage" src="{{photo.photo.url}}" alt="Main image" style="width: 35em; height: 21em;">
+			{% endwith %}
+			
+			{% for photo in photos %}
+				<a href="#"><img class="miniImage mt-1" src="{{photo.photo.url}}" alt="Mini image" style="width: 6.8em; height: 4em; opacity: 0.6;"></a>		
+			{% endfor %}									
+		</div>
+		<div class="col-sm-12 col-md-6">
+			<h4>{{court.name}}</h4>
+			<p>{{court.address.city}}, {{court.address.district}}, {{court.address}}</p>
+			<p>{{court.phone_number}}</p>
+			<p>{{court.price}}</p>
+			<p>{{court.created_at}}</p>
+			<p>{{court.rating}}</p>
+			<p>{{court.like}}</p>
+		</div>
+	</div>	
+</div>
+{% endblock %}
+
+{% block script %}
+
+{% endblock %}

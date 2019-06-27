@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}E-Court{% endblock %}
+
+{% block stylesheet %}
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<style>
+	.topsection {
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+		position: relative;
+	}
+	.topsection img{
+		width: 100%;
+		min-height: 30rem;
+		opacity: .5;
+	}
+	.search {
+		position: absolute;
+		background: #e3f2fd;
+		top: 0;
+		bottom: 0;
+		right: 0;
+    	left: 0;
+   		margin: auto;
+		max-width: 18rem;
+		max-height: 24rem;
+	}
+	.card-img-top {
+		width: 100%;
+		max-height: 9rem;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+	<!-- Top searchbar section of home page -->
+	<div class="topsection">
+		<img src="{% static 'img/courtplan.png' %}">
+		<form action="/action_page.php" class="search border border-primary rounded p-3">
+			<div class="form-group">
+				<h4>Search for court</h4>
+				<label for="name">Court name:</label>
+				<input type="text" class="form-control" id="name" placeholder="e.g. Court number one">
+			</div>
+			<div class="form-group">
+				<label for="datepicker">Order date:</label>
+				<input id="datepicker">
+			</div>
+			<div class="form-group">
+				<label for="timepicker">Order time:</label>
+				<input id="timepicker">
+			</div>
+			<button type="submit" class="btn btn-primary">Search</button>
+		</form>
+	</div>
+	<!-- Middle list section of newly added courts -->
+	<div class="midsection mt-5">
+		<h3>Newly added courts:</h3>
+		<div class="card-deck">
+			{% for court in courts %}
+			<div class="card">
+				{% with court.photos.all|first as photo %}
+				<img class="card-img-top" src="{{photo.photo.url}}" alt="Card image">
+				{% endwith %}
+				<div class="card-body">
+					<strong class="card-title">{{court.name}}</strong>
+					<p class="card-text">Some example text some example text. John Doe is an architect and engineer</p>
+					<a href="{% url 'court' court.pk %}" class="btn btn-primary stretched-link">Show more</a>
+				</div>
+			</div>
+			{% endfor %}
+		</div>
+	</div>
+	<!-- Bottom contact section -->
+	<div class="botsection mt-5">
+		<h3>Contact us:</h3>
+		<div class="row">
+			<div class="col-sm-12 col-md-6">
+				<form action="/action_page.php" class="contact">
+					<div class="form-group">
+						<label for="name">Name:</label>
+						<input type="text" class="form-control" id="name" placeholder="Your name" name="name">
+					</div>
+					<div class="form-group">
+						<label for="email">Email:</label>
+						<input type="email" class="form-control" id="email" placeholder="Your email" name="email">
+					</div>
+					<div class="form-group">
+						<label for="subject">Subject:</label>
+						<textarea class="form-control" rows="5" id="comment" name="text"></textarea>
+					</div>
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</form>
+			</div>
+			<div class="col-sm-12 col-md-6">
+				<table class="table table-borderless mt-4">
+					<tbody>
+						<tr>
+							<th>Company</th>
+							<td>Loremipsumio</td>
+						</tr>
+						<tr>
+							<th>Address</th>
+							<td>audsa, jaisda, asodaj , 2210akva, aasdlpapapapa - 1212</td>
+						</tr>
+						<tr>
+							<th>Phone number:</th>
+							<td>2981624961<br>1238391071</td>						
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script src="https://unpkg.com/gijgo@1.9.13/js/gijgo.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+    $('#datepicker').datepicker({
+        uiLibrary: 'bootstrap4'
+    });
+
+    $('#timepicker').timepicker({
+        uiLibrary: 'bootstrap4'
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% load static auth_extras %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+	<title>{% block title %}{% endblock %}</title>
+
+	<link rel="icon" href="{% static 'img/logo24.png' %}">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<link href="https://fonts.googleapis.com/css?family=Quicksand&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Quicksand|Ranga&display=swap" rel="stylesheet">
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	{% block stylesheet %} {% endblock %}
+	<style>
+		body {
+			background-color: #e3f2fd;
+			font-family: 'Quicksand', sans-serif;
+		}
+
+		.fa {
+			padding: 6px;
+			font-size: 18px;
+			width: 30px;
+			height: 30px;
+			text-align: center;
+			text-decoration: none;
+			margin: 5px 5px;
+			border-radius: 50%;
+		}
+
+		.fa:hover {
+			opacity: 0.7;
+		}
+
+		.fa-facebook {
+			background: #3B5998;
+			color: white;
+		}
+
+		.fa-twitter {
+			background: #55ACEE;
+			color: white;
+		}
+
+		.fa-google {
+			background: #dd4b39;
+			color: white;
+		}
+
+		.fa-user {
+			background: gray;
+			color: white;
+		}
+
+		nav {
+			font-weight: bold;	
+		}
+
+		.nav-link:hover {
+			background: #3399ff;
+		}
+	</style>
+</head>
+<body>
+	{% block body %}
+	<!-- Social media and user signin icons bar -->
+	<div class="container-fluid bg-dark" style="margin-bottom: 0">
+		<div class="container text-right">
+			<a href="#"><i class="fa fa-facebook"></i></a>
+			<a href="#"><i class="fa fa-twitter"></i></a>
+			<a href="#"><i class="fa fa-google"></i></a>
+			{% if user.is_authenticated %}
+			<a href="{% url 'account' %}"><i class="fa fa-user"></i></a>
+			{% else %}
+			<a href="{% url 'login' %}"><i class="fa fa-user"></i></a>
+			{% endif %}			
+		</div>
+	</div>	
+	<!-- Navigation -->
+	<nav class="navbar navbar-expand-sm bg navbar-light" style="background-color: #00ffff;">
+		<!-- Logo -->
+		<div class="container">
+		<a class="navbar-brand" href="{% url 'home' %}">
+			<img src="{% static 'img/logo32.png' %}">
+		</a>
+		<!-- Toggler -->
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<!-- Menu items -->
+		<div class="collapse navbar-collapse justify-content-end" id="collapsibleNavbar">
+			<ul class="navbar-nav">
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'home' %}" active>Home</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">About</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="{% url 'courts' %}">Order</a>
+				</li> 
+				<li class="nav-item">
+					<a class="nav-link" href="#">Contact</a>
+				</li>    
+				<!-- If authenticated user is court owner then show additional menu item called "My court" -->
+				{% if user.is_authenticated and request.user|has_group:"Court owner" %}
+				<li class="nav-item">
+					{% with user.court_owner.all|first as court %}
+					<a class="nav-link" href="{% url 'mycourt' court.pk %}">My court</a>
+					{% endwith %}
+				</li>    
+				{% endif %}				
+			</ul>
+		</div>
+		</div> 
+	</nav>
+	<!-- Body -->
+	{% block content %}
+	{% endblock %}
+	<!-- Footer -->
+	<footer id="footer" class="bg-dark text-center mt-5" style="height: 6rem; bottom: 0; color: white">
+		<p>Footer</p>
+	</footer>
+	{% endblock body %}
+</body>
+{% block script %}
+{% endblock script %}
+</html>

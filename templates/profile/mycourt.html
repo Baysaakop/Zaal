@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% load static crispy_forms_tags auth_extras %}
+
+{% block title %}My court{% endblock %}
+
+{% block stylesheet %}
+<style type="text/css">
+	.imgUp {
+		margin-bottom:15px;
+	}
+
+	.imgBox {
+		width: 100%;
+		height: 200px;
+		background-position: center center;
+		background:url("{% static 'img/noimageavailable.png' %}");
+		background-color:#fff;
+		background-size: cover;
+		background-repeat:no-repeat;
+		display: inline-block;
+		box-shadow:0px -3px 6px 2px rgba(0,0,0,0.2);
+	}
+
+	.imgBtn {
+		display: block;
+		border-radius: 0;
+		box-shadow:0px 4px 6px 2px rgba(0,0,0,0.2);
+		margin-top:-5px;
+	}
+
+	.imgAdd {
+		width:30px;
+		height:30px;
+		border-radius:50%;
+		color:#fff;
+		box-shadow:0px 0px 2px 1px rgba(0,0,0,0.2);
+		text-align:center;
+		margin-top:0px;
+		cursor:pointer;
+		font-size:15px;
+	}
+
+	.del
+	{
+		position:absolute;
+		top:0px;
+		right:10px;
+		width:30px;
+		height:30px;
+		text-align:center;
+		background-color:rgba(255,0,0,0.7);
+		color: #fff;
+		cursor:pointer;
+	}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+	<!-- List of courts that owned by current user (as nav) -->
+	<ul class="nav nav-tabs">
+		{% for c in courts %}
+			<li class="nav-item border-dark border-right">
+				<a class="nav-link text-dark" href="{% url 'mycourt' c.pk %}">{{c.name}}</a>
+			</li>
+		{% endfor %}
+	</ul>
+	<!-- Information about selected court -->
+	<div class="card border-dark">
+		<div class="card-body">
+			<form method="post" id="courtForm" data-districts-url="{% url 'load_districts' %}" enctype="multipart/form-data" novalidate>
+				{% csrf_token %}
+				<div class="form-row">
+					<div class="form-group col-md-6 mb-0">
+						{{ court_form.name|as_crispy_field }}
+					</div>
+					<div class="form-group col-md-6 mb-0">
+						{{ court_form.phone_number|as_crispy_field }}
+					</div>					
+				</div>
+				<div class="form-row">
+					<div class="form-group col-md-2 mb-0">
+						{{ court_form.price|as_crispy_field }}
+					</div>
+					<div class="form-group col-md-2 mb-0">
+						{{ court_form.like|as_crispy_field }}
+					</div>
+					<div class="form-group col-md-2 mb-0">
+						{{ court_form.rating|as_crispy_field }}
+					</div>
+					<div class="form-group col-md-6 mb-0">
+						{{ address_form.city|as_crispy_field }}						
+					</div>
+				</div>	
+				<div class="form-row">
+					<div class="form-group col-md-6 mb-0">						
+						{{ court_form.description|as_crispy_field }}												
+					</div>
+					<div class="form-group col-md-6 mb-0">						
+						{{ address_form.district|as_crispy_field }}
+						{{ address_form.address1|as_crispy_field }}
+						{{ address_form.address2|as_crispy_field }}										
+					</div>
+				</div>			
+				<div class="form-row">					
+					{% for photo in photos %}
+					<div class="imgUp form-group col-md-4">
+						<div class="imgBox border border-success" name="imgBox" style="background-image: url({{ photo.photo.url }})">							
+						</div>
+						<label class="imgBtn btn btn-success "> Browse							
+							<input type="file" name="imgInput" class="imgInput" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+					</div>
+					{% endfor %} 
+					<!-- Add new photos section -->									
+					<div class="imgUp form-group col-md-4">						
+						<div class="imgBox border border-success" name="imgBox">							
+						</div>
+						<label class="imgBtn btn btn-success "> Browse							
+							<input type="file" name="imgInput" class="imgInput" style="width: 0px;height: 0px;overflow: hidden;">
+						</label>
+						<i class="fa fa-times del"></i>
+					</div>
+					<i class="imgAdd fa fa-plus bg-success"></i>															
+				</div>
+				<button type="submit" class="btn btn-primary mt-2" name="mycourt">Save</button>
+			</form>
+		</div>
+	</div
+></div>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+	
+	$("#id_city").change(function () {
+		var url = $("#courtForm").attr("data-districts-url");
+		var cityId = $(this).val();
+		
+		$.ajax({
+			url: url,
+			data: {
+				'city': cityId
+			},
+			success: function(data) {
+				$("#id_district").html(data);				
+			}
+		});
+	});
+	
+	$(document).ready(function() {
+		$('#id_district').mousedown(function() {
+			var url = $("#courtForm").attr("data-districts-url");
+			var cityId = $("#id_city").val();
+			
+			$.ajax({
+				url: url,
+				data: {
+					'city': cityId
+				},
+				success: function(data) {
+					$("#id_district").html(data);				
+				}
+			});
+		})
+	});
+
+	$(".imgAdd").click(function(){
+		$(this).closest(".form-row").find('.imgAdd').before('<div class="imgUp form-group col-md-4"><div class="imgBox border border-success"></div><label class="imgBtn btn btn-success">Browse<input type="file" name="imgInput" class="imgInput" style="width: 0px;height: 0px;overflow: hidden;"></label><i class="fa fa-times del"></i></div>');
+	});
+
+	$(document).on("click", "i.del" , function() {
+		$(this).parent().remove();
+	});
+
+	$(function() {
+		$(document).on("change",".imgInput", function()
+		{
+			var uploadFile = $(this);
+			var files = !!this.files ? this.files : [];
+			if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
+
+			if (/^image/.test( files[0].type)){ // only image file
+				var reader = new FileReader(); // instance of the FileReader
+				reader.readAsDataURL(files[0]); // read the local file
+
+				reader.onloadend = function(){ // set image data as background of div
+					uploadFile.closest(".imgUp").find('.imgBox').css("background-image", "url("+this.result+")");
+				}
+			}
+
+	    });
+	});
+</script>
+{% endblock script %}
