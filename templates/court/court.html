@@ -6,35 +6,94 @@
 
 {% block stylesheet %}
 <style type="text/css">
-
+	.mainImage {
+		width: 100%;
+		height: auto;
+		max-height: 400px;
+	}
+	.miniImage {
+		width: 105px;
+		height: 55px;
+		opacity: 0.6;
+	}
+	.miniImage:hover {
+		cursor: pointer;
+	}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container">
 	<div class="row mt-5">
-		<div class="col-sm-12 col-md-6">		
+		<div class="col-sm-12 col-md-8">		
 			{% with court.photos.all|first as photo %}
-				<img class="mainImage" src="{{photo.photo.url}}" alt="Main image" style="width: 35em; height: 21em;">
+				<img class="mainImage" src="{{photo.photo.url}}" alt="Main image" id="mainImage">
 			{% endwith %}
 			
 			{% for photo in photos %}
-				<a href="#"><img class="miniImage mt-1" src="{{photo.photo.url}}" alt="Mini image" style="width: 6.8em; height: 4em; opacity: 0.6;"></a>		
+				<img class="miniImage mt-1" src="{{photo.photo.url}}" alt="Mini image">	
 			{% endfor %}									
 		</div>
-		<div class="col-sm-12 col-md-6">
+		<div class="col-sm-12 col-md-4">
 			<h4>{{court.name}}</h4>
-			<p>{{court.address.city}}, {{court.address.district}}, {{court.address}}</p>
-			<p>{{court.phone_number}}</p>
-			<p>{{court.price}}</p>
-			<p>{{court.created_at}}</p>
-			<p>{{court.rating}}</p>
-			<p>{{court.like}}</p>
+			<table class="table table-striped">
+				<tr>
+					<td>Address:</td>
+					<td>{{court.address.city}}, {{court.address.district}}, {{court.address}}</td>
+				</tr>
+				<tr>
+					<td>Phone number:</td>
+					<td>{{court.phone_number}}</td>
+				</tr>
+				<tr>
+					<td>Price:</td>
+					<td>{{court.price}}</td>
+				</tr>
+				<tr>
+					<td>Start date:</td>
+					<td>{{court.created_at|date}}</td>
+				</tr>
+				<tr>
+					<td>Rating:</td>
+					<td>{{court.rating}}</td>
+				</tr>
+				<tr>
+					<td>Likes:</td>
+					<td>{{court.like}}</td>
+				</tr>	
+			</table>
 		</div>
 	</div>	
+	<div class="card mt-4">
+		<div class="card-header">Time selection</div>
+		<div class="card-body">
+			<form>
+				<div class="custom-control custom-checkbox">
+					<input type="checkbox" class="custom-control-input" id="18" name="example1">
+					<label class="custom-control-label" for="18">18:00-19:00</label>
+				</div>
+				<div class="custom-control custom-checkbox">
+					<input type="checkbox" class="custom-control-input" id="19" name="example2">
+					<label class="custom-control-label" for="19">18:00-19:00</label>
+				</div>
+				<div class="custom-control custom-checkbox">
+					<input type="checkbox" class="custom-control-input" id="20" name="example3">
+					<label class="custom-control-label" for="20">18:00-19:00</label>
+				</div>
+			</form>
+		</div>
+	</div>
 </div>
 {% endblock %}
 
 {% block script %}
-
+	<script type="text/javascript">
+		var images = document.getElementsByClassName("miniImage");
+		for(var i = 0; i < images.length; i++) {
+			images[i].addEventListener("click", function(){
+				var src = this.getAttribute("src");
+				document.getElementById("mainImage").src = src;
+			});
+		}
+	</script>
 {% endblock %}

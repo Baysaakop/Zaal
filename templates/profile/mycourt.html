@@ -71,7 +71,8 @@
 		<div class="card-body">
 			<form method="post" id="courtForm" data-districts-url="{% url 'load_districts' %}" enctype="multipart/form-data" novalidate>
 				{% csrf_token %}
-				<div class="form-row">
+				<strong>Court information</strong>
+				<div class="form-row border-top">
 					<div class="form-group col-md-6 mb-0">
 						{{ court_form.name|as_crispy_field }}
 					</div>
@@ -79,6 +80,16 @@
 						{{ court_form.phone_number|as_crispy_field }}
 					</div>					
 				</div>
+				<div class="form-row">					
+					<div class="form-group col-md-6 mb-0">						
+						{{ court_form.description|as_crispy_field }}												
+					</div>
+					<div class="form-group col-md-6 mb-0">
+						{{ address_form.city|as_crispy_field }}
+						{{ address_form.district|as_crispy_field }}
+						{{ address_form.address1|as_crispy_field }}					
+					</div>
+				</div>	
 				<div class="form-row">
 					<div class="form-group col-md-2 mb-0">
 						{{ court_form.price|as_crispy_field }}
@@ -89,21 +100,65 @@
 					<div class="form-group col-md-2 mb-0">
 						{{ court_form.rating|as_crispy_field }}
 					</div>
-					<div class="form-group col-md-6 mb-0">
-						{{ address_form.city|as_crispy_field }}						
-					</div>
-				</div>	
-				<div class="form-row">
-					<div class="form-group col-md-6 mb-0">						
-						{{ court_form.description|as_crispy_field }}												
-					</div>
-					<div class="form-group col-md-6 mb-0">						
-						{{ address_form.district|as_crispy_field }}
-						{{ address_form.address1|as_crispy_field }}
+					<div class="form-group col-md-6 mb-0">												
 						{{ address_form.address2|as_crispy_field }}										
 					</div>
-				</div>			
-				<div class="form-row">					
+				</div>
+				<br>
+				<strong>Timetable</strong>
+				<div class="form-row">
+					<table class="table">
+						<thead>
+							<tr>
+								<th>Time/Day</th>
+								<th>Monday</th>
+								<th>Tuesday</th>
+								<th>Wednesday</th>
+								<th>Thursday</th>
+								<th>Friday</th>
+								<th>Saturday</th>
+								<th>Sunday</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><strong>Start time</strong></td>
+								{% if timetable %}
+								{% for day in timetable %}
+								<td>
+									<select name="start" class="custom-select">
+										<option {% if day.start == '08:00' %} selected {% endif %}>08:00</option>
+										<option {% if day.start == '09:00' %} selected {% endif %}>09:00</option>
+										<option {% if day.start == '10:00' %} selected {% endif %}>10:00</option>
+										<option {% if day.start == '11:00' %} selected {% endif %}>11:00</option>
+										<option {% if day.start == '12:00' %} selected {% endif %}>12:00</option>
+									</select>
+								</td>
+								{% endfor %}		
+								{% else %}
+								<p>None</p>
+								{% endif %}						
+							</tr>
+							<tr>
+								<td><strong>End time</strong></td>	
+								{% for day in timetable %}
+								<td>
+									<select name="end" class="custom-select">
+										<option {% if day.end == '20:00' %} selected {% endif %}>20:00</option>
+										<option {% if day.end == '21:00' %} selected {% endif %}>21:00</option>
+										<option {% if day.end == '22:00' %} selected {% endif %}>22:00</option>
+										<option {% if day.end == '23:00' %} selected {% endif %}>23:00</option>
+										<option {% if day.end == '00:00' %} selected {% endif %}>00:00</option>
+									</select>
+								</td>	
+								{% endfor %}															
+							</tr>
+						</tbody>
+					</table>				
+				</div>
+				<br>
+				<strong>Images</strong>
+				<div class="form-row border-top mt-2">					
 					{% for photo in photos %}
 					<div class="imgUp form-group col-md-4">
 						<div class="imgBox border border-success" name="imgBox" style="background-image: url({{ photo.photo.url }})">							

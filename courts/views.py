@@ -6,7 +6,7 @@ from django.forms import modelformset_factory
 from django.db.models import Q
 
 from .forms import CourtForm, AddressForm
-from .models import Court, City, District, Address, CourtPhoto
+from .models import Court, City, District, Address, CourtPhoto, TimeTable
 
 def home(request):
 	courts = Court.objects.order_by('-created_at')[:4]
@@ -29,13 +29,19 @@ def mycourt(request, pk):
 		address = None
 	address_form = AddressForm(instance=address)
 	photos = CourtPhoto.objects.filter(court=court)
+	timetable = TimeTable.objects.filter(court=court)
+	if(timetable.count() == 0):
+		for x in range(7):
+			TimeTable.objects.create(court=court, day=x+1)
 	courts = Court.objects.filter(owner=request.user)
 
 	if request.method == 'POST':
 		court_form = CourtForm(request.POST, instance=court)
 		address_form = AddressForm(request.POST, instance=address)	
 		image_list = request.FILES.getlist('imgInput')
-		
+		start_list = request.POST.getlist('start')
+		end_list = request.POST.getlist('end')		
+
 		if court_form.is_valid() and address_form.is_valid():
 			court = court_form.save(commit=False)
 			address = address_form.save(commit=False)
@@ -43,16 +49,21 @@ def mycourt(request, pk):
 			court.owner = request.user
 			court.address = address
 			court.save()
-			##CourtPhoto.objects.filter(court=court).delete()
+			
+			for x in range(7):
+				start = start_list[x]
+				end = end_list[x]
+				TimeTable.objects.filter(court=court).update(start=start, end=end)
+
 			for image in image_list:
-				print (image.name)
-				CourtPhoto.objects.create(court=court, photo=image)
+				CourtPhoto.objects.filter(court=court).update(photo=image)
 
 	return render(request, 'profile/mycourt.html', {
 		'courts': courts,
 		'court_form': court_form,
 		'address_form': address_form,
-		'photos': photos
+		'photos': photos,
+		'timetable': timetable
 	})
 
 def courts(request):
