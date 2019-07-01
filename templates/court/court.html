@@ -67,19 +67,15 @@
 	<div class="card mt-4">
 		<div class="card-header">Time selection</div>
 		<div class="card-body">
+			Today: {{today|date:"D, d, N, Y"}}
 			<form>
-				<div class="custom-control custom-checkbox">
-					<input type="checkbox" class="custom-control-input" id="18" name="example1">
-					<label class="custom-control-label" for="18">18:00-19:00</label>
+				{% for time in l_times %}
+				<div class="custom-control custom-radio">
+					<input type="radio" class="custom-control-input" id="{{time}}" name="time">
+					<label class="custom-control-label" for="{{time}}">{{time}}</label>
 				</div>
-				<div class="custom-control custom-checkbox">
-					<input type="checkbox" class="custom-control-input" id="19" name="example2">
-					<label class="custom-control-label" for="19">18:00-19:00</label>
-				</div>
-				<div class="custom-control custom-checkbox">
-					<input type="checkbox" class="custom-control-input" id="20" name="example3">
-					<label class="custom-control-label" for="20">18:00-19:00</label>
-				</div>
+				{% endfor %}
+				<button type="submit" class="btn btn-primary">Pick</button>
 			</form>
 		</div>
 	</div>

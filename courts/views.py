@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.forms import modelformset_factory
 from django.db.models import Q
+from datetime import datetime
 
 from .forms import CourtForm, AddressForm
 from .models import Court, City, District, Address, CourtPhoto, TimeTable
@@ -32,7 +33,8 @@ def mycourt(request, pk):
 	timetable = TimeTable.objects.filter(court=court)
 	if(timetable.count() == 0):
 		for x in range(7):
-			TimeTable.objects.create(court=court, day=x+1)
+			day = str(x+1)
+			TimeTable.objects.create(court=court, day=day)
 	courts = Court.objects.filter(owner=request.user)
 
 	if request.method == 'POST':
@@ -51,12 +53,13 @@ def mycourt(request, pk):
 			court.save()
 			
 			for x in range(7):
+				day = str(x+1)
 				start = start_list[x]
 				end = end_list[x]
-				TimeTable.objects.filter(court=court).update(start=start, end=end)
+				TimeTable.objects.filter(court=court, day=day).update(start=start, end=end)
 
 			for image in image_list:
-				CourtPhoto.objects.filter(court=court).update(photo=image)
+				CourtPhoto.objects.create(court=court, photo=image)
 
 	return render(request, 'profile/mycourt.html', {
 		'courts': courts,
@@ -166,5 +169,16 @@ def sort(courts, sort_type):
 
 def court(request, pk):
 	court = Court.objects.get(pk=pk)
-	photos = CourtPhoto.objects.filter(court=court)
-	return render(request,  'court/court.html', {'court': court, 'photos': photos})
+	photos = CourtPhoto.objects.filter(court=court)	
+	today = datetime.now()
+	today_n = datetime.now().strftime("%w")
+	timetable = TimeTable.objects.get(court=court, day=today_n)
+	start = int(timetable.start[0:2])
+	end = int(timetable.end[0:2])
+	i = start
+	l_times = []
+	while i < end - 1:
+		l_times.append(str(i) + ":00 - " + str(i+1) + ":00")	
+		i += 1
+
+	return render(request,  'court/court.html', {'court': court, 'photos': photos, 'today': today, 'timetable': timetable, 'l_times': l_times})

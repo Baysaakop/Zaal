@@ -55,15 +55,15 @@ class CourtPhoto(models.Model):
 class TimeTable(models.Model):
 	court = models.ForeignKey(Court, on_delete=models.CASCADE, related_name="timetable_court")		
 	WEEK_DAYS = (
-		(1, 'Monday'),
-		(2, 'Tuesday'),
-		(3, 'Wednesday'),
-		(4, 'Thursday'),
-		(5, 'Friday'),
-		(6, 'Saturday'),
-		(7, 'Sunday'),
+		('1', 'Monday'),
+		('2', 'Tuesday'),
+		('3', 'Wednesday'),
+		('4', 'Thursday'),
+		('5', 'Friday'),
+		('6', 'Saturday'),
+		('7', 'Sunday'),
 	)
-	day = models.CharField(max_length=3, choices=WEEK_DAYS, default='Mon')
+	day = models.CharField(max_length=1, choices=WEEK_DAYS, default='1')
 	start = models.CharField(max_length=5, default='08:00')
 	end = models.CharField(max_length=5, default='22:00')
 

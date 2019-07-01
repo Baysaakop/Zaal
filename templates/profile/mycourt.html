@@ -132,18 +132,21 @@
 										<option {% if day.start == '10:00' %} selected {% endif %}>10:00</option>
 										<option {% if day.start == '11:00' %} selected {% endif %}>11:00</option>
 										<option {% if day.start == '12:00' %} selected {% endif %}>12:00</option>
+										<option {% if day.start == '13:00' %} selected {% endif %}>13:00</option>
+										<option {% if day.start == '14:00' %} selected {% endif %}>14:00</option>
+										<option {% if day.start == '15:00' %} selected {% endif %}>15:00</option>
 									</select>
 								</td>
-								{% endfor %}		
-								{% else %}
-								<p>None</p>
-								{% endif %}						
+								{% endfor %}					
 							</tr>
 							<tr>
 								<td><strong>End time</strong></td>	
 								{% for day in timetable %}
 								<td>
 									<select name="end" class="custom-select">
+										<option {% if day.end == '17:00' %} selected {% endif %}>17:00</option>
+										<option {% if day.end == '18:00' %} selected {% endif %}>18:00</option>
+										<option {% if day.end == '19:00' %} selected {% endif %}>19:00</option>
 										<option {% if day.end == '20:00' %} selected {% endif %}>20:00</option>
 										<option {% if day.end == '21:00' %} selected {% endif %}>21:00</option>
 										<option {% if day.end == '22:00' %} selected {% endif %}>22:00</option>
@@ -151,7 +154,8 @@
 										<option {% if day.end == '00:00' %} selected {% endif %}>00:00</option>
 									</select>
 								</td>	
-								{% endfor %}															
+								{% endfor %}	
+								{% endif %}														
 							</tr>
 						</tbody>
 					</table>				
@@ -182,8 +186,8 @@
 				<button type="submit" class="btn btn-primary mt-2" name="mycourt">Save</button>
 			</form>
 		</div>
-	</div
-></div>
+	</div>
+</div>
 {% endblock %}
 
 {% block script %}
