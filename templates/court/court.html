@@ -68,14 +68,59 @@
 		<div class="card-header">Time selection</div>
 		<div class="card-body">
 			Today: {{today|date:"D, d, N, Y"}}
-			<form>
-				{% for time in l_times %}
-				<div class="custom-control custom-radio">
-					<input type="radio" class="custom-control-input" id="{{time}}" name="time">
-					<label class="custom-control-label" for="{{time}}">{{time}}</label>
+			<form method="post" enctype="multipart/form-data" novalidate>
+				{% csrf_token %}
+				<table class="table">
+					{% for start, end in times.items %}
+					<tr>
+						<td>{{start}} - {{end}}</td>	
+						{% for o in order %}
+							{% if o.start_time == start and o.end_time == end %}
+								{% if o.left_court %}
+									{% if o.right_court %}
+										
+									{% else %}
+										
+									{% endif %}
+								{% else %}
+									{% if o.right_court %}
+										
+									{% endif %}
+								{% endif %}
+							{% endif %}
+						{% endfor %}		
+
+						<td>
+							<div class="custom-control custom-radio">
+								<input type="radio" class="custom-control-input" id="left" name="left" value="left">
+								<label class="custom-control-label ml-5" for="left">Left</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio">
+								<input type="radio" class="custom-control-input" id="right" name="right" value="right">
+								<label class="custom-control-label ml-5" for="right">Right</label>
+							</div>
+						</td>
+						<td>
+							<div class="custom-control custom-radio">
+								<input type="radio" class="custom-control-input" id="full" name="full" value="full">
+								<label class="custom-control-label ml-5" for="full">Full</label>
+							</div>
+						</td>
+					</tr>
+					{% endfor %}
+				</table>
+				<!--
+				{% for time in times %}				
+				<div class="custom-control custom-radio">	
+					<strong>{{time}}</strong>								
+					<input type="radio" class="custom-control-input" id="{{time}}" name="time" value="{{time}}">
+					<label class="custom-control-label ml-5" for="{{time}}">Half</label>
 				</div>
 				{% endfor %}
-				<button type="submit" class="btn btn-primary">Pick</button>
+				-->
+				<button type="submit" class="btn btn-primary">Order</button>		
 			</form>
 		</div>
 	</div>

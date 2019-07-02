@@ -5,9 +5,10 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.forms import modelformset_factory
 from django.db.models import Q
 from datetime import datetime
+import uuid 
 
 from .forms import CourtForm, AddressForm
-from .models import Court, City, District, Address, CourtPhoto, TimeTable
+from .models import Court, City, District, Address, CourtPhoto, TimeTable, Order
 
 def home(request):
 	courts = Court.objects.order_by('-created_at')[:4]
@@ -173,12 +174,38 @@ def court(request, pk):
 	today = datetime.now()
 	today_n = datetime.now().strftime("%w")
 	timetable = TimeTable.objects.get(court=court, day=today_n)
+
+	if request.method == 'POST':
+		time_list = request.POST.getlist('time')
+		for x in time_list:
+			time_split = x.split(" - ")
+			start_time = time_split[0]
+			end_time = time_split[1]
+			number = uuid.uuid4().hex[:8].upper()
+			Order.objects.create(number=number, court=court, user=request.user, order_date=today, start_time=start_time, end_time=end_time)
+
+	order = Order.objects.filter(court=court, order_date=today)
+	times = getTimes(timetable)
+
+	return render(request,  'court/court.html', {'court': court, 'photos': photos, 'today': today, 'order': order, 'times': times})
+
+def getTimes(timetable):	
+	times = {}
 	start = int(timetable.start[0:2])
 	end = int(timetable.end[0:2])
 	i = start
-	l_times = []
 	while i < end - 1:
-		l_times.append(str(i) + ":00 - " + str(i+1) + ":00")	
+		start_time = formatTime(i)
+		end_time = formatTime(i+1)
+		times[start_time] = end_time
 		i += 1
 
-	return render(request,  'court/court.html', {'court': court, 'photos': photos, 'today': today, 'timetable': timetable, 'l_times': l_times})
+	return times
+
+def formatTime(time):
+	res = str(time)
+	if(len(res) == 1):
+		res = "0" + res;
+
+	res = res + ":00"
+	return res

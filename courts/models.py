@@ -72,7 +72,8 @@ class Order(models.Model):
 	number = models.CharField(max_length=8, unique=True)
 	court = models.ForeignKey(Court, on_delete=models.CASCADE, related_name="order_court")
 	user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="order_user")
-	order_date = models.DateTimeField(auto_now_add=True)
-	date = models.DateField(auto_now=True)
-	start_time = models.PositiveIntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(24)])
-	duration = models.PositiveIntegerField(default=1, validators=[MinValueValidator(0), MaxValueValidator(4)])
+	order_date = models.DateField(auto_now=True) ## Date of order
+	start_time = models.CharField(max_length=5, default='08:00')
+	end_time = models.CharField(max_length=5, default='09:00')
+	left_court = models.BooleanField(default=False)
+	right_court = models.BooleanField(default=False)
