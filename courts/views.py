@@ -181,15 +181,25 @@ def court(request, pk):
 			time_split = x.split(" - ")
 			start_time = time_split[0]
 			end_time = time_split[1]
+			side = time_split[2]
+			left = False
+			right = False
+			if side == 'L':
+				left = True
+			elif side == 'R':
+				right = True
+			elif side == 'F':
+				left = True
+				right = True
 			number = uuid.uuid4().hex[:8].upper()
-			Order.objects.create(number=number, court=court, user=request.user, order_date=today, start_time=start_time, end_time=end_time)
+			Order.objects.create(number=number, court=court, user=request.user, order_date=today, start_time=start_time, end_time=end_time, left_court=left, right_court=right)
 
 	order = Order.objects.filter(court=court, order_date=today)
-	times = getTimes(timetable)
+	times = getTimes(timetable, order)
 
 	return render(request,  'court/court.html', {'court': court, 'photos': photos, 'today': today, 'order': order, 'times': times})
 
-def getTimes(timetable):	
+def getTimes(timetable, order):	
 	times = {}
 	start = int(timetable.start[0:2])
 	end = int(timetable.end[0:2])
@@ -197,7 +207,17 @@ def getTimes(timetable):
 	while i < end - 1:
 		start_time = formatTime(i)
 		end_time = formatTime(i+1)
-		times[start_time] = end_time
+		side = ""
+		for o in order:
+			if o.start_time == start_time and o.end_time == end_time:
+				if o.left_court:
+					if o.right_court:
+						side = "Full"
+					else:
+						side = "Left"
+				else:
+					side = "Right"
+		times[start_time + " - " + end_time] = side
 		i += 1
 
 	return times
